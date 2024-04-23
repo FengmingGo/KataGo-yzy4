@@ -227,7 +227,7 @@ static void updateDynamicPDAHelper(
       //Hard cap of 2.75 in this parameter, since more extreme values start to reach into values without good training.
       //Scale mildly with board size - small board a given point lead counts as "more".
       double pdaCap = std::min(
-        2.75,
+        10.50,
         dynamicPlayoutDoublingAdvantageCapPerOppLead *
         (initialAdvantageInPoints - pdaScalingStartPoints) * boardSizeScaling
       );
@@ -245,9 +245,9 @@ static void updateDynamicPDAHelper(
           winLossValue = -winLossValue;
 
         //Keep winLossValue between 5% and 25%, subject to available caps.
-        if(winLossValue < -0.9)
+        if(winLossValue < -0.8)
           desiredDynamicPDAForDisadvantagedPla = desiredDynamicPDAForDisadvantagedPla + 0.125;
-        else if(winLossValue > -0.5)
+        else if(winLossValue > 0)
           desiredDynamicPDAForDisadvantagedPla = desiredDynamicPDAForDisadvantagedPla - 0.125;
 
         desiredDynamicPDAForDisadvantagedPla = std::max(desiredDynamicPDAForDisadvantagedPla, 0.0);
@@ -1134,12 +1134,12 @@ struct GTPEngine {
       }
       cerr << "MALKOVICH:"
            << "Visits " << visits
-           << " Winrate " << Global::strprintf("%.2f%%", winrate * 100.0)
-           << " ScoreLead " << Global::strprintf("%.1f", leadForPrinting)
-           << " ScoreStdev " << Global::strprintf("%.1f", values.expectedScoreStdev);
+           << " Winrate " << Global::strprintf("%.3f%%", winrate * 100.0)
+           << " ScoreLead " << Global::strprintf("%.2f", leadForPrinting)
+           << " ScoreStdev " << Global::strprintf("%.2f", values.expectedScoreStdev);
       if(params.playoutDoublingAdvantage != 0.0) {
         cerr << Global::strprintf(
-          " (PDA %.2f)",
+          " (PDA %.3f)",
           bot->getSearch()->getRootPla() == getOpp(params.playoutDoublingAdvantagePla) ?
           -params.playoutDoublingAdvantage : params.playoutDoublingAdvantage);
       }
@@ -2292,12 +2292,12 @@ int MainCmds::gtp(const vector<string>& args) {
         int i;
         int64_t i64;
         double d;
-        if(pieces[0] == "playoutDoublingAdvantage") {
-          if(Global::tryStringToDouble(pieces[1],d) && d >= -3.0 && d <= 3.0)
+        if(pieces[0] == "playoutDoublingAdvantage" || pieces[0] == "pda") {
+          if(Global::tryStringToDouble(pieces[1],d) && d >= -1.0 && d <= 15.0)
             engine->setStaticPlayoutDoublingAdvantage(d);
           else {
             responseIsError = true;
-            response = "Invalid value for " + pieces[0] + ", must be float from -3.0 to 3.0";
+            response = "Invalid value for " + pieces[0] + ", must be float from -1.0 to 15.0";
           }
         }
         else if(pieces[0] == "rootPolicyTemperature") {
