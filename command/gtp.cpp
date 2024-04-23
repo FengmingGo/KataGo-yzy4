@@ -224,7 +224,7 @@ static void updateDynamicPDAHelper(
       //Power of 2 to avoid any rounding issues.
       const double increment = 0.125;
 
-      //Hard cap of 2.75 in this parameter, since more extreme values start to reach into values without good training.
+      //Hard cap of 10.50 in this parameter, since more extreme values start to reach into values without good training.
       //Scale mildly with board size - small board a given point lead counts as "more".
       double pdaCap = std::min(
         10.50,
@@ -244,7 +244,7 @@ static void updateDynamicPDAHelper(
         if(disadvantagedPla == P_BLACK)
           winLossValue = -winLossValue;
 
-        //Keep winLossValue between 5% and 25%, subject to available caps.
+        //Keep winLossValue between 10% and 50%, subject to available caps.
         if(winLossValue < -0.8)
           desiredDynamicPDAForDisadvantagedPla = desiredDynamicPDAForDisadvantagedPla + 0.125;
         else if(winLossValue > 0)
